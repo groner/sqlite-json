@@ -1,0 +1,31 @@
+-- Should be SQL NULL
+SELECT JSON_UNQUOTE('null') AS 'null';
+null      
+----------
+NULL      
+SELECT JSON_UNQUOTE('null') IS NULL AS 'null IS NULL';
+null IS NULL
+------------
+1           
+-- Should be null
+SELECT JSON_UNQUOTE('"null"') AS 'null';
+null      
+----------
+null      
+SELECT JSON_UNQUOTE('"null"') IS NOT NULL AS 'null IS NOT NULL';
+null IS NOT NULL
+----------------
+1               
+-- Should be foo
+SELECT JSON_UNQUOTE('"foo"') AS 'foo';
+foo       
+----------
+foo       
+-- Should be 123
+SELECT JSON_UNQUOTE('123') AS '123';
+123       
+----------
+123       
+-- Should reject with an error
+Error: near line 12: cannot unquote object or array
+SELECT JSON_UNQUOTE('[1,2,3]') AS '???';

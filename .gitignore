@@ -1,0 +1,4 @@
+/json-c/
+/local.mk
+*.o
+*.dylib
