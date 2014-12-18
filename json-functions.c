@@ -10,7 +10,7 @@ void json_extract_func(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
     struct json_tokener *tok = sqlite3_user_data(ctx);
     struct json_object *root_obj, *obj;
     enum json_tokener_error jerr;
-    int i, missing = 0;
+    int i, idx, missing = 0;
 
     if (argc < 1) {
         // What is -1?  It seems to always be used and the docs did not explain.
@@ -34,8 +34,14 @@ void json_extract_func(sqlite3_context *ctx, int argc, sqlite3_value **argv) {
     for (obj = root_obj, i = 1; i < argc && obj != NULL && !json_object_is_type(obj, json_type_null); i++) {
         switch (json_object_get_type(obj)) {
             case json_type_array:
-                missing = json_object_array_length(obj) <= sqlite3_value_int(argv[i]);
-                obj = json_object_array_get_idx(obj, sqlite3_value_int(argv[i]));
+                idx = sqlite3_value_int(argv[i]);
+                if (idx < 0) {
+                    idx += json_object_array_length(obj);
+                    missing = idx < 0;
+                } else {
+                    missing = idx >= json_object_array_length(obj);
+                }
+                obj = json_object_array_get_idx(obj, idx);
                 break;
 
             case json_type_object:
